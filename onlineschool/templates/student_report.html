@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Отчёт успеваемости студента {{ student.name }}</h2>
+<p>Email: {{ student.email }}</p>
+
+{% if detailed_history and detailed_history|length > 0 %}
+<table style="width:100%; text-align:center; border-collapse: collapse;">
+  <tr style="background-color:#f8f9fa;">
+    <th>Курс</th>
+    <th>Оценка</th>
+    <th>Преподаватель</th>
+  </tr>
+  {% for entry in detailed_history %}
+  <tr {% if entry.grade >=4 %}style="background-color:#d4edda;"{% else %}style="background-color:#f8d7da;"{% endif %}>
+      <td>{{ entry.course_title }}</td>
+      <td>{{ entry.grade }}</td>
+      <td>{{ entry.teacher_object.name if entry.teacher_object else 'Неизвестно' }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p style="text-align:center;">У этого студента еще нет завершенных курсов и оценок.</p>
+{% endif %}
+
+<!-- Кнопка для экспорта в CSV -->
+<a href="{{ url_for('export_data', student_id=student.id, type='student_report') }}"
+   class="btn btn-success mb-3">
+   <i class="bi bi-download"></i> Экспортировать в CSV
+</a>
+
+<!-- Контейнер для визуализации (графика) -->
+<div id="chartContainer" style="margin-top: 30px; width: 100%; height: 300px;"></div>
+
+<br/>
+<a href="{{ url_for('students') }}" class="btn btn-secondary">Назад к списку студентов</a>.
+
+<!-- Подключаем библиотеку для графиков Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      const grades = []; // Массив для оценок (данные графика)
+      const labels = []; // Массив для названий курсов (подписи на графике)
+
+      {% if detailed_history and detailed_history|length > 0 %}
+          {% for entry in detailed_history %}
+          grades.push({{ entry.grade }}); // Добавляем оценку в массив данных
+          labels.push("{{ entry.course_title | replace("'", "\\'") }}"); // Добавляем название курса в массив подписей
+          {% endfor %}
+      {% else %}
+          // Если курсов нет, оставляем массивы пустыми, чтобы не рисовать пустой график
+          grades = [];
+          labels = [];
+      {% endif %}
+
+      // Рисуем график, только если есть данные для отображения
+      if (grades.length > 0) {
+          const ctx = document.getElementById('chartContainer').getContext('2d');
+          new Chart(ctx, {
+              type: 'bar',
+              data: {
+                  labels: labels,
+                  datasets: [{
+                      label: 'Оценки по курсам',
+                      data: grades,
+                      backgroundColor: grades.map(g => g >= 4 ? '#d4edda' : '#f8d7da'),
+                      borderColor: grades.map(g => g >= 4 ? '#28a745' : '#dc3545'),
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  scales: {
+                      y: {
+                          beginAtZero: true,
+                          max: 5,
+                          ticks: { stepSize: 1 }
+                      }
+                  },
+                  plugins: {
+                      legend: { display: false },
+                      tooltip: {
+                          callbacks: { label: function(context) { return 'Оценка: ' + context.raw; } }
+                      }
+                  }
+              }
+          });
+      }
+  });
+</script>
+{% endblock %}

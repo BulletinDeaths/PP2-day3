@@ -1,0 +1,144 @@
+{
+    "students": [
+        {
+            "id": 2,
+            "name": "Петрова Мария",
+            "email": "petrova@mail.ru",
+            "history": []
+        },
+        {
+            "id": 3,
+            "name": "Сидоров Алексей",
+            "email": "sidorov@mail.ru",
+            "history": []
+        },
+        {
+            "id": 4,
+            "name": "Кузнецова Ольга",
+            "email": "kuznecova@mail.ru",
+            "history": []
+        },
+        {
+            "id": 5,
+            "name": "Васильев Дмитрий",
+            "email": "vasiliev@mail.ru",
+            "history": []
+        },
+        {
+            "id": 6,
+            "name": "Токарев Григорий",
+            "email": "tok@mail.ru",
+            "history": []
+        },
+        {
+            "id": 1,
+            "name": "yujkhjkk",
+            "email": "yujkyuuyk@ghgftf",
+            "history": []
+        },
+        {
+            "id": 1,
+            "name": "fghgfhgfh",
+            "email": "fthfghgf@dghfghgf",
+            "history": []
+        }
+    ],
+    "teachers": [
+        {
+            "id": 2,
+            "name": "Смирнова Елена Игоревна",
+            "specialization": "Физика"
+        },
+        {
+            "id": 3,
+            "name": "Волков Андрей Борисович",
+            "specialization": "Программирование"
+        },
+        {
+            "id": 4,
+            "name": "Евгения Рыжова Андреевна",
+            "specialization": "Химия"
+        },
+        {
+            "id": 2,
+            "name": "Олег Андреевич",
+            "specialization": "Работа с Unity"
+        },
+        {
+            "id": 3,
+            "name": "Екатерина Леонидовна",
+            "specialization": "Углублённая математика"
+        }
+    ],
+    "courses": [
+        {
+            "id": 4,
+            "title": "Геометрия. Углубленный курс",
+            "topic": "Математика",
+            "status": "активен",
+            "students": [
+                3
+            ],
+            "teacher_id": 2,
+            "modules": []
+        },
+        {
+            "id": 5,
+            "title": "Python",
+            "topic": "Python для базы",
+            "status": "завершён",
+            "students": [],
+            "teacher_id": null,
+            "modules": []
+        },
+        {
+            "id": 6,
+            "title": "Профессиональная Математика",
+            "topic": "Углублённое изучение Математики на основе Алгебра-логики",
+            "status": "активен",
+            "students": [],
+            "teacher_id": null,
+            "modules": []
+        },
+        {
+            "id": 1,
+            "title": "мпарпар",
+            "topic": "авпрпрп",
+            "status": "активен",
+            "students": [],
+            "teacher_id": null,
+            "modules": []
+        },
+        {
+            "id": 2,
+            "title": "олролрл",
+            "topic": "нлгдш",
+            "status": "активен",
+            "students": [],
+            "teacher_id": 2,
+            "modules": []
+        },
+        {
+            "id": 3,
+            "title": "ераерае",
+            "topic": "еркаер",
+            "status": "активен",
+            "students": [],
+            "teacher_id": 4,
+            "modules": []
+        }
+    ],
+    "modules": [],
+    "lessons": [],
+    "homeworks": [],
+    "homework_grades": [],
+    "next_ids": {
+        "student": 1,
+        "teacher": 1,
+        "course": 1,
+        "module": 1,
+        "lesson": 1,
+        "homework": 1,
+        "homework_grade": 1
+    }
+}
