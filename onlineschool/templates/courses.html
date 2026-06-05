@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Курсы</h2>
+<div style="max-height: 600px; overflow-y: auto; width: 100%;">
+<table id="courses-table" class="table table-sm w-100">
+    <tr>
+        <!-- Заголовок колонки -->
+        <th>#</th>
+        <th>Название</th>
+        <th>Тема</th>
+        <th>Статус</th>
+        <th>Преподаватель</th>
+        <th>Студентов</th>
+        <th>Действия</th>
+    </tr>
+
+        {% for course in courses %}
+    <!-- СТРОКА С ДАННЫМИ (Просмотр) -->
+    <tr style="background-color: {% if course.status == 'активен' %}#d4edda;{% else %}#f8d7da;{% endif %};"
+        data-loop-index="{{ loop.index }}"
+    >
+        <!-- Вместо {{ course.id }} используем {{ loop.index }} -->
+        <td>{{ loop.index }}</td>
+
+        <td>{{ course.title }}</td>
+        <td>{{ course.topic }}</td>
+        <td>{{ course.status }}</td>
+
+        {% set teacher = repo.find_teacher_by_id(course.teacher_id) %}
+        <td>
+            {% if teacher %}
+                <span style="padding: 3px 6px; border-radius: 4px;">{{ teacher.name }}</span>
+            {% else %}
+                Не назначен
+            {% endif %}
+        </td>
+
+        <td>{{ course.students|length }}</td>
+        <td>
+            <!-- Кнопка удаления -->
+            <form action="{{ url_for('delete_course', course_id=course.id) }}" method="post" style="display:inline-block; margin-right: 5px;">
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Удалить курс?')">Удалить</button>
+            </form>
+
+            <!-- Кнопка редактирования -->
+            <button class="btn btn-info btn-sm edit-btn"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#editRow{{ course.id }}">
+                Редактировать
+            </button>
+        </td>
+    </tr>
+
+    <!-- СТРОКА С ФОРМОЙ (Редактирование) -->
+    <tr id="editRow{{ course.id }}" class="collapse">
+        <td colspan="7" style="padding: 5px 10px; background-color: #f8f9fa;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <label for="teacherSelect{{ course.id }}" class="mb-0" style="white-space: nowrap;">Преподаватель:</label>
+                <select class="form-select" style="flex-grow: 1;" id="teacherSelect{{ course.id }}" name="teacher_id">
+                    <option value="">Не назначен</option>
+                    {% for teacher in repo.teachers %}
+                    <option value="{{ teacher.id }}" {% if teacher.id == course.teacher_id %}selected{% endif %}>
+                        {{ teacher.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="btn btn-primary mt-2 ms-2" id="saveBtn{{ course.id }}">
+                    Сохранить
+                </button>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+</div>
+<!-- БЛОК СОЗДАНИЯ НОВОГО КУРСА -->
+<div style="background-color: #e9ecef; padding: 20px; border-radius: 10px; margin-top: 20px;">
+    <h3>Создать новый курс</h3>
+    <form action="{{ url_for('add_course') }}" method="post">
+        <label for="titleCreate" class="me-2">Название курса:</label>
+        <input type="text" id="titleCreate" name="title" required><br><br>
+
+        <label for="topicCreate" class="me-2">Тема курса:</label>
+        <input type="text" id="topicCreate" name="topic" required><br><br>
+
+        <label for="teacherSelectCreate" class="me-2">Преподаватель:</label>
+        <select id="teacherSelectCreate" name="teacher_id">
+            <option value="">Не назначать сразу</option>
+            {% for teacher in repo.teachers %}
+            <option value="{{ teacher.id }}">{{ teacher.name }} ({{ teacher.specialization }})</option>
+            {% endfor %}
+        </select><br><br>
+
+        <button type="submit" class="btn btn-primary">Создать курс</button>
+    </form>
+</div>
+<hr>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Вспомогательная функция для скрытия панели редактирования
+    async function hideEditForm(saveButton) {
+        // Находим строку с формой редактирования
+        const editRow = saveButton.closest('tr');
+        const dataRow = editRow.previousElementSibling; // Родительская строка с данными
+
+        // Скрываем форму (Bootstrap Collapse)
+        const collapseInstance = bootstrap.Collapse.getInstance(editRow);
+        if (collapseInstance) {
+            await collapseInstance.hide();
+        }
+    }
+
+    // ГЛАВНАЯ ФУНКЦИЯ ОБНОВЛЕНИЯ (теперь принимает кнопку)
+    async function updateUI(saveButton, newTeacherName) {
+        // 1. Находим строку с формой редактирования, используя переданную кнопку
+        const editRow = saveButton.closest('tr');
+
+        // 2. Находим родительскую строку с данными (предыдущий элемент)
+        const dataRow = editRow.previousElementSibling;
+
+        // 3. Находим ячейку Преподавателя (6-я по счёту, индекс 5)
+        const teacherCell = dataRow.cells[5];
+
+        // 4. Очищаем все стили (иначе белый фон перекроет зеленый/красный)
+        teacherCell.removeAttribute('style');
+
+        // 5. Оборачиваем текст в SPAN с красивым оформлением
+        teacherCell.innerHTML = `
+            <span style="
+                padding: 3px 6px;
+                border-radius: 4px;
+                background-color: inherit; /* Наследуем цвет строки */
+            ">${newTeacherName}</span>
+        `;
+    }
+
+    // --- ИСПРАВЛЕННЫЙ ОСНОВНОЙ СКРИПТ ---
+    {% for course in courses %}
+    (function() {
+        const courseId = "{{ course.id }}";
+
+        // Находим элементы для этого конкретного курса
+        const saveButton = document.getElementById('saveBtn' + courseId);
+
+        if (saveButton) {
+            saveButton.addEventListener('click', async () => {
+                // Находим <select> элемент и получаем выбранные значения
+                const selectElement = saveButton.closest('tr').querySelector('select');
+                const selectedTeacherId = selectElement.value;
+                const selectedTeacherName = selectElement.options[selectElement.selectedIndex].text;
+
+                if (!selectedTeacherId) {
+                    await hideEditForm(saveButton);
+                    return;
+                }
+
+                try {
+                    const response = await fetch("{{ url_for('assign_teacher') }}", {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            course_id: courseId,
+                            teacher_id: selectedTeacherId
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Теперь вызываем updateUI и передаем ей кнопку и новое имя
+                        await updateUI(saveButton, selectedTeacherName);
+                        await hideEditForm(saveButton);
+                    } else {
+                        alert('Ошибка: ' + (data.message || 'Не удалось назначить преподавателя.'));
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при связи с сервером.');
+                }
+            });
+        }
+    })();
+    {% endfor %}
+</script>
+{% endblock %}

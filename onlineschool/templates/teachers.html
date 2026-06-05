@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Преподаватели</h2>
+
+<table>
+    <tr>
+        <!-- Заголовок колонки -->
+        <th>#</th>
+        <th>Имя</th>
+        <th>Специализация</th>
+        <th>Удалить</th>
+    </tr>
+
+  {% for teacher in teachers %}
+  <tr>
+      <!-- Вместо {{ teacher.id }} используем {{ loop.index }} -->
+      <td>{{ loop.index }}</td>
+
+      <td>{{ teacher.name }}</td>
+      <td>{{ teacher.specialization }}</td>
+      <td>
+          <!-- ФОРМА ДЛЯ УДАЛЕНИЯ-->
+          <form action="{{ url_for('delete_teacher', teacher_id=teacher.id) }}" method="post" style="display:inline;">
+              <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Вы уверены, что хотите удалить этого преподавателя?')">Удалить</button>
+          </form>
+      </td>
+  </tr>
+  {% endfor %}
+</table>
+<hr>
+
+<h3>Добавить нового преподавателя</h3>
+<form action="{{ url_for('add_teacher') }}" method="post">
+    <label for="name">Имя:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="specialization">Специализация:</label>
+    <input type="text" id="specialization" name="specialization" required>
+
+    <button type="submit" class="btn btn-success">Добавить преподавателя</button>
+</form>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+    <div style="background-color: #e9ecef; padding: 20px; border-radius: 10px; text-align: center; width: 250px;">
+        <h3>Участники</h3>
+        <a href="{{ url_for('students') }}" class="btn btn-primary w-100">Студенты</a>
+        <br><br>
+        <a href="{{ url_for('teachers') }}" class="btn btn-primary w-100">Преподаватели</a>
+    </div>
+
+    <div style="background-color: #e9ecef; padding: 20px; border-radius: 10px; text-align: center; width: 250px;">
+        <h3>Курсы</h3>
+        <a href="{{ url_for('courses') }}" class="btn btn-success w-100">Курсы и оценки</a>
+    </div>
+
+    <!-- Отчет по преподавателю -->
+    <div style="background-color: #e9ecef; padding: 20px; border-radius: 10px; text-align: center; width: 250px;">
+        <h3>Аналитика</h3>
+        {% for teacher in teachers %}
+            <a href="{{ url_for('teacher_report', teacher_id=teacher.id) }}" class="btn btn-info w-100 mb-2">
+                Отчёт по {{ teacher.name }}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
